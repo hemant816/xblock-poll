@@ -447,19 +447,20 @@ class PollBlock(PollBase, CSVExportMixin):
     # pylint: disable=too-many-instance-attributes
 
     display_name = String(default=_('Poll'))
+    poll_timer = 60
     question = String(default=_('What is your favorite color?'))
     # This will be converted into an OrderedDict.
     # Key, (Label, Image path)
     answers = List(
         default=[
-            ('R', {'label': _('Red'), 'img': None, 'img_alt': None}),
-            ('B', {'label': _('Blue'), 'img': None, 'img_alt': None}),
-            ('G', {'label': _('Green'), 'img': None, 'img_alt': None}),
-            ('O', {'label': _('Other'), 'img': None, 'img_alt': None}),
+            ('a', {'label': _('Red'), 'img': 'https://s3-ap-southeast-1.amazonaws.com/docmode.co/site-imgs/Polling-A-Button.png', 'img_alt': 'a'}),
+            ('b', {'label': _('Blue'), 'img': 'https://s3-ap-southeast-1.amazonaws.com/docmode.co/site-imgs/Polling-B-Button.png', 'img_alt': 'b'}),
+            ('c', {'label': _('Green'), 'img': 'https://s3-ap-southeast-1.amazonaws.com/docmode.co/site-imgs/PollingC-Button.png', 'img_alt': 'c'}),
+            
         ],
         scope=Scope.settings, help=_("The answer options on this poll.")
     )
-    tally = Dict(default={'R': 0, 'B': 0, 'G': 0, 'O': 0},
+    tally = Dict(default={'a': 0, 'b': 0, 'c': 0},
                  scope=Scope.user_state_summary,
                  help=_("Total tally of answers from students."))
     choice = String(scope=Scope.user_state, help=_("The student's answer"))
@@ -568,6 +569,7 @@ class PollBlock(PollBase, CSVExportMixin):
             'js_template': js_template,
             'any_img': self.any_image(self.answers),
             'display_name': self.display_name,
+            'poll_timer' : self.poll_timer,
             'can_vote': self.can_vote(),
             'max_submissions': self.max_submissions,
             'submissions_count': self.submissions_count,
@@ -622,6 +624,7 @@ class PollBlock(PollBase, CSVExportMixin):
         context.update({
             'question': self.question,
             'display_name': self.display_name,
+            'poll_timer': self.poll_timer,
             'private_results': self.private_results,
             'feedback': self.feedback,
             'js_template': js_template,
@@ -722,6 +725,7 @@ class PollBlock(PollBase, CSVExportMixin):
         max_submissions = self.get_max_submissions(self.ugettext, data, result, private_results)
 
         display_name = data.get('display_name', '').strip()
+        poll_timer = data.get('poll_timer','').strip()
         if not question:
             result['errors'].append(self.ugettext("You must specify a question."))
             result['success'] = False
@@ -736,6 +740,7 @@ class PollBlock(PollBase, CSVExportMixin):
         self.feedback = feedback
         self.private_results = private_results
         self.display_name = display_name
+        self.poll_timer = poll_timer
         self.max_submissions = max_submissions
 
         # Tally will not be updated until the next attempt to use it, per
@@ -837,6 +842,7 @@ class SurveyBlock(PollBase, CSVExportMixin):
     # pylint: disable=too-many-instance-attributes
 
     display_name = String(default=_('Survey'))
+    poll_timer = 60
     # The display name affects how the block is labeled in the studio,
     # but either way we want it to say 'Poll' by default on the page.
     block_name = String(default=_('Poll'))

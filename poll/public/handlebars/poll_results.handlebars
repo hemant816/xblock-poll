@@ -7,7 +7,7 @@
         {{#each tally}}
             <li class="poll-result">
                 <div class="poll-result-input-container">
-                  <input id="answer-{{key}}-{{../block_id}}" type="radio" disabled {{#if choice}}checked{{/if}} />
+                  <input id="answer-{{key}}-{{../block_id}}" type="radio" disabled {{#if choice}}checked{{/if}} style="display:none;"/>
                 </div>
                 {{~#if ../any_img~}}
                     <div class="poll-image result-image">

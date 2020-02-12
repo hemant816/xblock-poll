@@ -10,6 +10,13 @@
                 <input class="input setting-input" name="display_name" id="poll-display-name" value="{{ display_name }}" type="text" />
             </div>
         </li>
+        <li class="field comp-setting-entry is-set">
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label poll-setting-label" for="poll-timer">{% trans 'Answer Timer' %}</label>
+                <!-- In the case of surveys, this field will actually be used for block_name. -->
+                <input class="input setting-input" name="poll_timer" id="poll_timer" value="{{ poll_timer }}" type="text" />
+            </div>
+        </li>
         {% if not multiquestion %}
             <li class="field comp-setting-entry is-set">
                 <h2><label for="poll-question-editor">{% trans 'Question/Prompt' %}</label></h2>

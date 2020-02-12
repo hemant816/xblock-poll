@@ -1,7 +1,28 @@
 {% load i18n %}
 {{ js_template|safe }}
+<style type="text/css">
+  #progress_{{ block_id }} {
+      width: 90%;
+      margin: 10px auto;
+      height: 22px;
+      background-color: #0A5F44;
+    }
+
+    #progress_{{ block_id }} div {
+      height: 100%;
+      text-align: right;
+      padding: 0 10px;
+      line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+      width: 0;
+      background-color: #CBEA00;
+      box-sizing: border-box;
+    }
+</style>
+{% if not studio_edit %}
+  <div id="poll_{{ block_id }}" >
+{%endif%}
 <div class="poll-block themed-xblock" data-private="{% if private_results %}1{% endif %}"
-     data-can-vote="{% if can_vote %}1{% endif %}">
+     data-can-vote="{% if can_vote %}1{% endif %}" >
   <div class="poll-block-form-wrapper">
 
     <h3 class="poll-header">{{ display_name }}</h3>
@@ -11,11 +32,12 @@
         <legend class="poll-question">
           {{ question|safe }}
         </legend>
-        <div class="poll-answers">
-          {% for key, value in answers %}
-            <div class="poll-answer">
+        <div class="poll-answers col-md-12">
+          {% for key, value in answers  %}
+            
+            <div class="poll-answer col-md-3">
               <div class="poll-input-container">
-                <input type="radio" name="choice" id="poll-{{ block_id }}-answer-{{ key }}" value="{{ key }}"
+                <input type="radio" name="choice" id="poll-{{ block_id }}-answer-{{ key }}" value="{{ key }}" style="display: none;" 
                     {% if choice == key %}checked{% endif %}/>
               </div>
               {% if any_img %}
@@ -33,6 +55,9 @@
         </div>
       </fieldset>
       <input class="input-main" type="button" name="poll-submit" value="{% trans 'Submit' %}" disabled/>
+        <div id='progress_{{ block_id }}'>
+          <div></div>
+        </div>
     </form>
 
     <div class="poll-voting-thanks
@@ -61,10 +86,13 @@
   </div>
       {% if can_view_private_results %}
       <div class="view-results-button-wrapper">
-        <button class="view-results-button">{% trans 'View results' %}</button>
+        <button class="view-results-button" id="{{block_id}}">{% trans 'View results' %}</button>
       </div>
     {% endif %}
 </div>
+{% if not studio_edit %}
+  </div>
+{%endif%}
 {% if can_view_private_results %}
   {% if not studio_edit %}
     <div class="export-results-button-wrapper">
@@ -76,3 +104,24 @@
     <p>{% trans "Student data and results CSV available for download in the LMS." %}</p>
   {% endif %}
 {% endif %}
+
+  <script type="text/javascript">
+
+
+function progress(timeleft, timetotal, $element) {
+      
+      var progressBarWidth = timeleft * $element.width() / timetotal;
+      
+      $element.find('div').animate({ width: progressBarWidth }, 500).html(timeleft);
+      if(timeleft > 0) {
+          setTimeout(function() {
+              progress(timeleft - 1, timetotal, $element);
+          }, 1000);
+      } else if (timeleft == 0){
+      	$('#{{block_id}}').click();
+        //self.getResults();
+      }
+    };
+
+    progress('{{poll_timer}}', '{{poll_timer}}', $('#progress_{{ block_id }}'));
+  </script>
